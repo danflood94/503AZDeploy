@@ -53,7 +53,7 @@ Resources:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t3.micro
-      ImageId: ami-0b0dcb5067f052a63 # Amazon Linux 2023
+      ImageId: ami-0b0dcb5067f052a63
       KeyName: my-key-pair
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
@@ -149,7 +149,7 @@ Resources:
   PublicS3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: healthcare-files-${AWS::StackName}
+      BucketName: healthcare-files
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         IgnorePublicAcls: false
