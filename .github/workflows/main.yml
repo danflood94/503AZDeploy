@@ -21,7 +21,11 @@ jobs:
       working-directory: ${{ github.workspace }}
     - name: Deploy Main Stack
       run: |
-        aws cloudformation deploy --stack-name corestack --template-file mainstack.yml 
+       aws cloudformation deploy \
+        --stack-name corestack \
+        --template-file mainstack.yml \
+        --capabilities CAPABILITY_NAMED_IAM \
+        --parameter-overrides AdminPassword=${{ secrets.ADMIN_PASSWORD }} StudentNumber=${{ secrets.STUDENT_NUMBER }}
     - name: Deploy Web Server Stack
       run: |
         aws cloudformation deploy \
