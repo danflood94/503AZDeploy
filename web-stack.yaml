@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  VPCId:
+    Type: String
+    Description: The ID of the VPC (from main stack)
+  PublicSubnet1Id:
+    Type: String
+    Description: The ID of the public subnet (from main stack)
+  DatabaseEndpoint:
+    Type: String
+    Description: The endpoint of the RDS database (from main stack)
+
+Resources:
+  WebServerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow HTTP and HTTPS traffic to the web server
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: WebServerSecurityGroup
+
+  WebServerInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0b0dcb5067f052a63 # Amazon Linux 2023
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: '0'
+          SubnetId: !Ref PublicSubnet1Id
+          GroupSet:
+            - !Ref WebServerSecurityGroup
+      Tags:
+        - Key: Name
+          Value: WebServerInstance
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -e
+          dnf update -y
+          dnf install -y httpd php php-mysqlnd mariadb
+          systemctl start httpd
+          systemctl enable httpd
+
+          # Write PHP application
+          cat <<EOF > /var/www/html/index.php
+          <!DOCTYPE html>
+          <html>
+          <body>
+          <h1>Healthcare Patients</h1>
+          <?php
+          \$servername = "${DatabaseEndpoint}";
+          \$username = "admin";
+          \$password = "password";
+          \$dbname = "healthcare_db";
+
+          \$conn = new mysqli(\$servername, \$username, \$password, \$dbname);
+          if (\$conn->connect_error) {
+              echo "<p style='color:red;'>Connection failed: " . htmlspecialchars(\$conn->connect_error) . "</p>";
+          } else {
+              \$sql = "SELECT name FROM patients";
+              \$result = \$conn->query(\$sql);
+
+              if (\$result && \$result->num_rows > 0) {
+                  while (\$row = \$result->fetch_assoc()) {
+                      echo "<p>" . htmlspecialchars(\$row['name']) . "</p>";
+                  }
+              } else {
+                  echo "<p>No records found or query failed.</p>";
+              }
+              \$conn->close();
+          }
+          ?>
+          </body>
+          </html>
+          EOF
+          chown apache:apache /var/www/html/index.php
+          chmod 644 /var/www/html/index.php
+
+Outputs:
+  WebServerPublicIP:
+    Description: The public IP address of the web server
+    Value: !GetAtt WebServerInstance.PublicIp
