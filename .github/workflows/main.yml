@@ -23,7 +23,7 @@ jobs:
       run: |
         aws cloudformation deploy \
           --stack-name web-server-stack \
-          --template-file web-server-stack.yaml \
+          --template-file web-server-stack.yml \
           --capabilities CAPABILITY_NAMED_IAM \
           --parameter-overrides \
           VPCId=$(aws cloudformation describe-stacks --stack-name main-stack --query "Stacks[0].Outputs[?OutputKey=='VPCId'].OutputValue" --output text) \
