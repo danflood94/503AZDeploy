@@ -1,0 +1,37 @@
+name: Deploy CloudFormation Stacks
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
+
+    - name: Deploy Main Stack
+      run: |
+        aws cloudformation deploy \
+          --stack-name main-stack \
+          --template-file main-stack.yaml \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --parameter-overrides \
+          AdminPassword=${{ secrets.DB_ADMIN_PASSWORD }} \
+          StudentNumber=${{ secrets.STUDENT_NUMBER }}
+
+    - name: Deploy Web Server Stack
+      run: |
+        aws cloudformation deploy \
+          --stack-name web-server-stack \
+          --template-file web-server-stack.yaml \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --parameter-overrides \
+          VPCId=$(aws cloudformation describe-stacks --stack-name main-stack --query "Stacks[0].Outputs[?OutputKey=='VPCId'].OutputValue" --output text) \
+          PublicSubnet1Id=$(aws cloudformation describe-stacks --stack-name main-stack --query "Stacks[0].Outputs[?OutputKey=='PublicSubnet1Id'].OutputValue" --output text) \
+          DatabaseEndpoint=$(aws cloudformation describe-stacks --stack-name main-stack --query "Stacks[0].Outputs[?OutputKey=='DatabaseEndpoint'].OutputValue" --output text)
