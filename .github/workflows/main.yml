@@ -16,6 +16,7 @@ jobs:
         aws-region: us-east-1
     - name: List Files
       run: ls -R
+      working-directory: ${{ github.workspace }}
     - name: Deploy Main Stack
       run: |
         aws cloudformation deploy --stack-name corestack --template-file mainstack.yml 
