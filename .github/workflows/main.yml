@@ -17,8 +17,7 @@ jobs:
 
     - name: Deploy Main Stack
       run: |
-        aws cloudformation deploy --stack-name corestack --template-file mainstack.yml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides AdminPassword=${{ secrets.ADMIN_PASSWORD }} StudentNumber=${{ secrets.STUDENT_NUMBER }}
-      working-directory: ${{ github.workspace }}  
+        aws cloudformation deploy --stack-name corestack --template-file mainstack.yml 
     - name: Deploy Web Server Stack
       run: |
         aws cloudformation deploy \
