@@ -22,6 +22,7 @@ jobs:
           --template-file main-stack.yaml \
           --capabilities CAPABILITY_NAMED_IAM \
           --parameter-overrides \
+          AdminPassword=${{ secrets.ADMIN_PASSWORD }} \
           StudentNumber=${{ secrets.STUDENT_NUMBER }}
 
     - name: Deploy Web Server Stack
