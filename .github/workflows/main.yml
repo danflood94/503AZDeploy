@@ -18,7 +18,7 @@ jobs:
     - name: Deploy Main Stack
       run: |
         aws cloudformation deploy --stack-name corestack --template-file mainstack.yml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides AdminPassword=${{ secrets.ADMIN_PASSWORD }} StudentNumber=${{ secrets.STUDENT_NUMBER }}
-
+      working-directory: ${{ github.workspace }}  
     - name: Deploy Web Server Stack
       run: |
         aws cloudformation deploy \
@@ -29,3 +29,4 @@ jobs:
           VPCId=$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='VPCId'].OutputValue" --output text) \
           PublicSubnet1Id=$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='PublicSubnet1Id'].OutputValue" --output text) \
           DatabaseEndpoint=$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='DatabaseEndpoint'].OutputValue" --output text)
+      working-directory: ${{ github.workspace }}
