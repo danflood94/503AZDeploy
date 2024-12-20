@@ -14,7 +14,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
-
+    - name: List Files
+      run: ls -R
     - name: Deploy Main Stack
       run: |
         aws cloudformation deploy --stack-name corestack --template-file mainstack.yml 
