@@ -149,7 +149,7 @@ Resources:
   PublicS3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: healthcare-files
+      BucketName: !Sub 'healthcare-files-${AWS::AccountId}-${AWS::Region}-${AWS::StackName}'
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         IgnorePublicAcls: false
