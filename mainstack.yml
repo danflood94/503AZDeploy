@@ -111,7 +111,7 @@ Resources:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t3.medium
-      ImageId: ami-0b0dcb5067f052a63
+      ImageId: ami-0b1f2b17be9b81cdc
       KeyName: vockey
       NetworkInterfaces:
         - AssociatePublicIpAddress: true

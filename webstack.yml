@@ -29,7 +29,7 @@ Resources:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t3.micro
-      ImageId: ami-0b0dcb5067f052a63 # Amazon Linux 2023
+      ImageId: ami-01816d07b1128cd2d
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: '0'
