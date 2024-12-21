@@ -47,14 +47,14 @@ Resources:
           systemctl start httpd
           systemctl enable httpd
 
-          # Write PHP application
+          # Write the PHP application to display patients
           cat <<EOF > /var/www/html/index.php
           <!DOCTYPE html>
           <html>
           <body>
           <h1>Healthcare Patients</h1>
           <?php
-          \$servername = "${DatabaseEndpoint}";
+          \$servername = "mydbinstance.czasioym20l1.us-east-1.rds.amazonaws.com";
           \$username = "admin";
           \$password = "password";
           \$dbname = "healthcare_db";
@@ -63,22 +63,46 @@ Resources:
           if (\$conn->connect_error) {
               echo "<p style='color:red;'>Connection failed: " . htmlspecialchars(\$conn->connect_error) . "</p>";
           } else {
-              \$sql = "SELECT name FROM patients";
+              // SQL query to select all patients
+              \$sql = "SELECT * FROM patients";
               \$result = \$conn->query(\$sql);
 
               if (\$result && \$result->num_rows > 0) {
-                  while (\$row = \$result->fetch_assoc()) {
-                      echo "<p>" . htmlspecialchars(\$row['name']) . "</p>";
+                  // Start the HTML table
+                  echo "<table border='1' style='border-collapse: collapse; width: 100%;'>";
+                  echo "<thead><tr>";
+
+                  // Fetch and display column headers dynamically
+                  \$columns = \$result->fetch_fields();
+                  foreach (\$columns as \$column) {
+                      echo "<th style='padding: 8px; text-align: left; background-color: #f2f2f2;'>" . htmlspecialchars(\$column->name) . "</th>";
                   }
+
+                  echo "</tr></thead><tbody>";
+
+                  // Fetch and display each row of data
+                  while (\$row = \$result->fetch_assoc()) {
+                      echo "<tr>";
+                      foreach (\$row as \$value) {
+                          echo "<td style='padding: 8px;'>" . htmlspecialchars(\$value) . "</td>";
+                      }
+                      echo "</tr>";
+                  }
+
+                  echo "</tbody></table>";
               } else {
                   echo "<p>No records found or query failed.</p>";
               }
+
+              // Close the connection
               \$conn->close();
           }
           ?>
           </body>
           </html>
           EOF
+
+          # Set proper permissions for the PHP file
           chown apache:apache /var/www/html/index.php
           chmod 644 /var/www/html/index.php
 

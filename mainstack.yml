@@ -172,7 +172,7 @@ Resources:
       DBInstanceClass: db.t3.small
       Engine: mysql
       MasterUsername: admin
-      MasterUserPassword: !Ref AdminPassword
+      MasterUserPassword: password
       AllocatedStorage: 20
       PubliclyAccessible: true
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
