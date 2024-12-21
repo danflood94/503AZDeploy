@@ -47,41 +47,6 @@ Resources:
           systemctl start httpd
           systemctl enable httpd
 
-          # Write PHP application
-          cat <<EOF > /var/www/html/index.php
-          <!DOCTYPE html>
-          <html>
-          <body>
-          <h1>Healthcare Patients</h1>
-          <?php
-          \$servername = "${DatabaseEndpoint}";
-          \$username = "admin";
-          \$password = "password";
-          \$dbname = "healthcare_db";
-
-          \$conn = new mysqli(\$servername, \$username, \$password, \$dbname);
-          if (\$conn->connect_error) {
-              echo "<p style='color:red;'>Connection failed: " . htmlspecialchars(\$conn->connect_error) . "</p>";
-          } else {
-              \$sql = "SELECT name FROM patients";
-              \$result = \$conn->query(\$sql);
-
-              if (\$result && \$result->num_rows > 0) {
-                  while (\$row = \$result->fetch_assoc()) {
-                      echo "<p>" . htmlspecialchars(\$row['name']) . "</p>";
-                  }
-              } else {
-                  echo "<p>No records found or query failed.</p>";
-              }
-              \$conn->close();
-          }
-          ?>
-          </body>
-          </html>
-          EOF
-          chown apache:apache /var/www/html/index.php
-          chmod 644 /var/www/html/index.php
-
 Outputs:
   WebServerPublicIP:
     Description: The public IP address of the web server
