@@ -27,11 +27,69 @@ Resources:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags:
         - Key: Name
           Value: PublicSubnet1
         - Key: StudentNumber
           Value: !Ref StudentNumber
+  
+  PublicSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags:
+        - Key: Name
+          Value: PublicSubnet2
+        - Key: StudentNumber
+          Value: !Ref StudentNumber
+
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: HealthSecureIGW
+        - Key: StudentNumber
+          Value: !Ref StudentNumber
+
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: PublicRouteTable
+        - Key: StudentNumber
+          Value: !Ref StudentNumber
+
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation1:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref RouteTable
+
+  SubnetRouteTableAssociation2:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref RouteTable
 
   BastionSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -40,8 +98,8 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
+          FromPort: 3389
+          ToPort: 3389
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
@@ -52,9 +110,9 @@ Resources:
   BastionHost:
     Type: 'AWS::EC2::Instance'
     Properties:
-      InstanceType: t3.micro
+      InstanceType: t3.medium
       ImageId: ami-0b0dcb5067f052a63
-      KeyName: my-key-pair
+      KeyName: vockey
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
@@ -70,17 +128,13 @@ Resources:
   ManagedAD:
     Type: 'AWS::DirectoryService::MicrosoftAD'
     Properties:
-      Name: example.local
+      Name: healthcare.local
       Password: !Ref AdminPassword
       VpcSettings:
         VpcId: !Ref VPC
         SubnetIds:
           - !Ref PublicSubnet1
-      Tags:
-        - Key: Name
-          Value: ManagedAD
-        - Key: StudentNumber
-          Value: !Ref StudentNumber
+          - !Ref PublicSubnet2
 
   DatabaseSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
