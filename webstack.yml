@@ -54,7 +54,7 @@ Resources:
           <body>
           <h1>Healthcare Patients</h1>
           <?php
-          \$servername = "mydbinstance.czasioym20l1.us-east-1.rds.amazonaws.com";
+          \$servername = "${DatabaseEndpoint}";
           \$username = "admin";
           \$password = "password";
           \$dbname = "healthcare_db";
