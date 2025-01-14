@@ -26,12 +26,18 @@ jobs:
            --template-file mainstack.yml \
            --capabilities CAPABILITY_NAMED_IAM \
            --parameter-overrides AdminPassword=${{ secrets.ADMIN_PASSWORD }} StudentNumber=${{ secrets.STUDENT_NUMBER }}
-      - name: Upload Data to Bucket and DB
+      - name: Install MySQL
         run: |
           sudo apt-get update -y
           sudo apt-get install mysql-client -y
-          mysql -h $(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='DatabaseEndpoint'].OutputValue" --output text) \
-            -u admin -p password < DBQuery.sql
+      - name: Get DatabaseEndpoint
+        id: getDatabase
+        run: |
+          echo "DB_ENDPOINT=$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='DatabaseEndpoint'].OutputValue" --output text)" >> $GITHUB_ENV
+      - name: Load Database
+        run: |
+          echo "Attempting to connect to database: $DB_ENDPOINT"
+          mysql -h $DB_ENDPOINT -u admin -p password < DBQuery.sql
           aws s3 cp patient1.pdf s3://$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)/patient1.pdf
           aws s3 cp patient2.pdf s3://$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)/patient2.pdf
       - name: Deploy Web Server Stack
