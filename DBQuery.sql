@@ -13,7 +13,7 @@ CREATE TABLE patients (
     Address VARCHAR(255)
 );
 
-INSERT INTO Patients (PatientID, FirstName, LastName, DateOfBirth, Gender, PhoneNumber, Email, Address) VALUES
+INSERT INTO patients (PatientID, FirstName, LastName, DateOfBirth, Gender, PhoneNumber, Email, Address) VALUES
 (1, 'John', 'Doe', '1985-06-15', 'Male', '123-456-7890', 'john.doe@example.com', '123 Elm St, Springfield, IL'),
 (2, 'Jane', 'Smith', '1990-03-22', 'Female', '987-654-3210', 'jane.smith@example.com', '456 Oak St, Springfield, IL'),
 (3, 'Emily', 'Johnson', '1978-11-30', 'Female', '555-123-4567', 'emily.johnson@example.com', '789 Pine St, Springfield, IL'),
