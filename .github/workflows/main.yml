@@ -37,7 +37,7 @@ jobs:
       - name: Load Database
         run: |
           echo "Attempting to connect to database: $DB_ENDPOINT"
-          mysql -h $DB_ENDPOINT -u admin -p password < DBQuery.sql
+          mysql -v -h $DB_ENDPOINT -u admin -p password < DBQuery.sql
           aws s3 cp patient1.pdf s3://$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)/patient1.pdf
           aws s3 cp patient2.pdf s3://$(aws cloudformation describe-stacks --stack-name corestack --query "Stacks[0].Outputs[?OutputKey=='S3BucketName'].OutputValue" --output text)/patient2.pdf
       - name: Deploy Web Server Stack
