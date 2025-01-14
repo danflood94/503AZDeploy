@@ -1,5 +1,7 @@
 CREATE DATABASE healthcare_db;
 
+USE DATABASE healthcare_db;
+
 CREATE TABLE patients (
     PatientID INT PRIMARY KEY,
     FirstName VARCHAR(50),
